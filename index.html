@@ -317,7 +317,7 @@ table.spec tr.cls td{background:var(--paper);font-size:11.5px;font-weight:700;te
 <section class="view" id="v-lib">
   <h2>Pathway library</h2>
   <p class="lede">The curated pathways behind every recommendation.</p>
-  <div class="subtabs seg" data-k="libtab"><button data-v="paths" aria-pressed="true">Syndrome pathways</button><button data-v="spec">Spectrum of activity</button><button data-v="refs">References</button></div>
+  <div class="subtabs seg" data-k="libtab"><button data-v="paths" aria-pressed="true">Syndrome pathways</button><button data-v="spec">Spectrum of activity</button></div>
   <input class="search" id="libq" placeholder="Filter by syndrome, drug or module">
   <div class="panel" style="margin-top:14px;padding:0"><div class="tablewrap" id="libtable" style="max-height:640px"></div></div>
 </section>
@@ -602,37 +602,37 @@ const SPEC_ORGS=[
 ];
 // 23 cells per row, in the order of SPEC_ORGS.  + active · ± variable · 0 not reliable · R intrinsic · – not applicable
 const SPEC_ROWS=[
- ["Penicillins","Penicillin G",                "0 0 0 + + ± + 0 + R R R R R R R R R R 0 0 0 R"],
- ["Penicillins","Ampicillin / Amoxicillin",    "0 0 0 + + ± + 0 + ± R ± R R 0 0 R R R ± 0 0 R"],
- ["Penicillins","Amoxicillin-clavulanate",     "+ 0 ± + + ± + 0 + ± ± + R R 0 0 R R R + + + R"],
+ ["Penicillins","Penicillin G",                "± 0 0 + + ± + ± + R R R R R R R R R R 0 0 0 R"],
+ ["Penicillins","Ampicillin / Amoxicillin",    "± 0 0 + + ± + ± + ± R ± R R 0 0 R R R ± 0 0 R"],
+ ["Penicillins","Amoxicillin-clavulanate",     "+ 0 ± + + ± + ± + ± ± + R R 0 0 R R R + + + R"],
  ["Penicillins","Cloxacillin / Flucloxacillin","+ 0 ± + + ± 0 0 0 R R R R R R R R R R 0 0 0 R"],
- ["Penicillins","Piperacillin-tazobactam",     "+ 0 ± + + ± + 0 + + + + ± + 0 0 + ± R + + + R"],
+ ["Penicillins","Piperacillin-tazobactam",     "+ 0 ± + + ± + ± + + + + ± + 0 0 + ± R + + + R"],
  ["Cephalosporins","Cefazolin",                "+ 0 ± + + + R R R ± ± ± R R 0 0 R R R 0 0 0 R"],
  ["Cephalosporins","Cefuroxime",               "+ 0 ± + + + R R R ± ± + 0 R 0 0 R R R + + 0 R"],
- ["Cephalosporins","Ceftriaxone",              "+ 0 ± + + + R R R + + + 0 + 0 0 R R R + + 0 R"],
+ ["Cephalosporins","Ceftriaxone",              "+ 0 0 + + + R R R + + + 0 + 0 0 R R R + + 0 R"],
  ["Cephalosporins","Ceftazidime",              "0 0 0 + + ± R R R + + + 0 + 0 0 + ± ± + + 0 R"],
- ["Cephalosporins","Cefepime",                 "+ 0 ± + + + R R R + + + + + 0 0 + ± 0 + + 0 R"],
+ ["Cephalosporins","Cefepime",                 "+ 0 0 + + + R R R + + + + + 0 0 + ± 0 + + 0 R"],
  ["Cephalosporins","Ceftazidime-avibactam",    "0 0 0 + + ± R R R + + + + + + + + ± ± + + 0 R"],
  ["Carbapenems","Ertapenem",                   "+ 0 ± + + + ± 0 0 + + + + + + 0 R R R + + + R"],
  ["Carbapenems","Meropenem",                   "+ 0 ± + + + ± 0 ± + + + + + + 0 + ± R + + + R"],
  ["Monobactam","Aztreonam",                    "R R R R R R R R R + + + ± + 0 0 + R R + + R R"],
  ["Fluoroquinolones","Ciprofloxacin",          "0 0 ± ± ± 0 ± 0 0 ± ± ± ± + ± 0 + ± 0 + + 0 +"],
  ["Fluoroquinolones","Levofloxacin",           "+ 0 ± ± + + + 0 + ± ± ± ± + ± 0 + ± ± + + 0 +"],
- ["Fluoroquinolones","Moxifloxacin",           "+ 0 ± ± + + + 0 + ± ± ± ± + ± 0 0 ± ± + + ± +"],
+ ["Fluoroquinolones","Moxifloxacin",           "+ 0 ± ± + + + ± + ± ± ± ± + ± 0 0 ± ± + + ± +"],
  ["Aminoglycosides","Gentamicin",              "± ± ± ± 0 ± ± ± ± + + + + + ± ± + 0 R 0 0 R 0"],
  ["Aminoglycosides","Amikacin",                "0 0 0 0 0 0 0 R 0 + + + + + ± ± + ± R 0 0 R 0"],
  ["Glycopeptides & others","Vancomycin",       "+ + + + + + + ± 0 R R R R R R R R R R R R R R"],
- ["Glycopeptides & others","Linezolid",        "+ + + + + + + + + R R R R R R R R R R 0 0 ± 0"],
- ["Glycopeptides & others","Daptomycin",       "+ + + + + + + + 0 R R R R R R R R R R R R R R"],
- ["Others","Trimethoprim-sulfamethoxazole",    "+ + ± ± ± 0 0 0 + ± ± ± ± ± ± ± R ± + + + 0 0"],
- ["Others","Doxycycline",                      "+ + ± 0 + ± ± ± 0 ± ± R ± 0 ± ± R 0 + + + ± +"],
- ["Others","Tigecycline",                      "+ + + + + + + + + + + R + + + + R + + + + + +"],
- ["Others","Azithromycin",                     "± 0 ± ± ± ± 0 0 0 R R R R R R R R R R ± + 0 +"],
- ["Others","Clindamycin",                      "+ ± ± + + ± R R 0 R R R R R R R R R R 0 0 ± 0"],
+ ["Glycopeptides & others","Linezolid",        "+ + + + + + + + + R R R R R R R R R R 0 0 0 0"],
+ ["Glycopeptides & others","Daptomycin",       "+ + + + ± 0 + + 0 R R R R R R R R R R R R R R"],
+ ["Others","Trimethoprim-sulfamethoxazole",    "+ + + ± ± 0 0 0 + ± ± ± ± ± ± ± R ± + + + 0 0"],
+ ["Others","Doxycycline",                      "+ + ± 0 ± ± ± ± 0 ± 0 R 0 0 0 0 R 0 + + + ± +"],
+ ["Others","Tigecycline",                      "+ + + + + + + ± 0 + + R + + + + R + + + 0 + +"],
+ ["Others","Azithromycin",                     "± 0 ± ± ± ± 0 0 0 R R R R R R R R R R + + 0 +"],
+ ["Others","Clindamycin",                      "+ ± ± + + ± R R 0 R R R R R R R R R R 0 0 0 0"],
  ["Others","Metronidazole",                    "R R R R R R R R R R R R R R R R R R R R R + R"],
- ["Urinary agents","Nitrofurantoin (urine only)","± ± + – – – + ± – + ± R ± R + ± R R R – – – –"],
- ["Urinary agents","Fosfomycin (oral, urine)", "± ± ± – – – ± ± – + ± ± ± ± + ± ± R R – – R –"],
- ["Polymyxins","Colistin",                     "R R R R R R R R R + + R ± R + ± + + + + ± R R"]
+ ["Urinary agents","Nitrofurantoin (urine only)","0 0 ± – – – + + – + ± R ± R ± ± R R R – – – –"],
+ ["Urinary agents","Fosfomycin (oral, urine)", "0 0 0 – – – ± ± – + ± ± ± ± + ± ± R R – – R –"],
+ ["Polymyxins","Colistin",                     "R R R R R R R R R + + R ± R + + + + + 0 0 R R"]
 ];
 // Short notes shown when a cell is selected
 const SPEC_NOTES={
@@ -670,7 +670,7 @@ function renderSpectrum(q){
       return head+`<tr><th class="drug" scope="row">${esc(drug)}</th>${v.map((s,i)=>{const o=SPEC_ORGS[i][0],n=SPEC_NOTES[drug+"|"+o];const lab=SPEC_LEGEND.find(x=>x[0]===s)[2];
         return `<td class="sc ${SPEC_CLASS[s]}${n?" has-note":""}" tabindex="0" data-col="${i}" data-d="${esc(drug)}" data-o="${esc(o)}" data-l="${lab}" data-n="${esc(n||"")}" aria-label="${esc(drug)} against ${esc(o)}: ${lab}${n?". "+esc(n):""}">${s}</td>`}).join("")}</tr>`}).join("")||`<tr><td colspan="${SPEC_ORGS.length+1}">No antimicrobial matches "${esc(q)}".</td></tr>`}</tbody>
   </table></div>
-  <p class="hint">Compiled for Al-Sobh ASP DSS. Intrinsic resistance follows CLSI M100 (Appendix B) and EUCAST Expected Resistant Phenotypes; activity grades reflect general reference consensus for empirical choice, cross-checked against the Sanford Guide 2022 (Table 4A/4B) where legible. The local antibiogram and the patient's susceptibility results always take precedence. A dot in a cell means there is a note. Pending ASP and Microbiology review.</p>
+  <p class="hint">Compiled for Al-Sobh ASP DSS. Intrinsic resistance follows CLSI M100 (Appendix B) and EUCAST Expected Resistant Phenotypes; activity grades reflect general reference consensus for empirical choice, cross-checked cell by cell against the Sanford Guide 2022 (Table 4A/4B). The local antibiogram and the patient's susceptibility results always take precedence. A dot in a cell means there is a note. Pending ASP and Microbiology review.</p>
   </div>`;
 }
 function wireSpectrum(root){
