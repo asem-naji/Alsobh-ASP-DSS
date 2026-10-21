@@ -853,18 +853,31 @@ function wireSpectrum(root){
 
 
 /* ---------- clinician backend ---------- */
+const CREATING=new Map();
 const api={
   // Production (Firebase): a failed write blocks submission so nothing is lost silently.
   // Preview (Claude / opened as a file): best-effort only, never blocks the clinician.
   async session(){let u=await authReady;if(!auth.currentUser)await withTimeout(auth.signInAnonymously());return auth.currentUser.uid},
   async create(l){
     if(!FB){previewSave(l);return true}
-    try{const uid=await api.session();await withTimeout(db.collection(COL).doc(l.id).set({...l,uid}));return true}catch(e){console.error(e);return false}
+    const p=(async()=>{try{const uid=await api.session();await withTimeout(db.collection(COL).doc(l.id).set({...l,uid}));return true}catch(e){console.error(e);return false}})();
+    CREATING.set(l.id,p);return p;
   },
   async update(l,patch){
     Object.assign(l,patch);
     if(!FB){previewSave(l);return true}
-    try{await api.session();await withTimeout(db.collection(COL).doc(l.id).update(patch));return true}catch(e){console.error(e);return false}
+    /* Wait for the record's first save to finish; if that save failed or the record is missing, write the whole record
+       (allowed by the rules both for a new record and for an existing one where only feedback fields change). */
+    const pending=CREATING.get(l.id); if(pending){try{await pending}catch(e){}}
+    for(let attempt=0;attempt<3;attempt++){
+      try{await api.session();await withTimeout(db.collection(COL).doc(l.id).update(patch));return true}
+      catch(e){
+        console.warn("update failed, retrying with full record",e);
+        try{const uid=await api.session();await withTimeout(db.collection(COL).doc(l.id).set({...l,uid}));return true}catch(e2){console.error(e2)}
+        await new Promise(r=>setTimeout(r,800*(attempt+1)));
+      }
+    }
+    return false;
   }
 };
 function previewSave(l){if(CLAUDE){try{window.storage.set("dsslog:"+l.id,JSON.stringify(l),true).catch(()=>{})}catch(e){}}}
@@ -973,11 +986,12 @@ $("#go").addEventListener("click",async()=>{
     pathwayId:out.row.id,match:out.stop?"Safety stop":out.idc?"ID referral":out.noAbx?"No antibiotic":out.exact?"Exact":"Fallback",safetyStop:out.stop,anaphylaxisPath:out.usedAna,
     recommended:out.rec,alternative:out.alt,status:real?"Awaiting answer":"Submitted",purpose:Q.purpose,prescribed:"",reason:"",otherRegimen:"",review72:"",rating:"",comment:"",submittedAt:real?"":now,updatedAt:"",version:VERSION};
   if(STALE&&SHOWN&&SHOWN.purpose==="Education"&&!SHOWN.rating&&!SHOWN.comment){await api.update(SHOWN,{status:"Superseded",updatedAt:Date.now()})}
+  api.create(log);
   renderResult(out);renderSubmit(log,false);SHOWN=log;STALE=false;
   if(log.purpose==="Real patient"){const tr=document.querySelector("#result .trace");if(tr)tr.insertAdjacentHTML("afterbegin",`<span><b>Case code ${caseCode(log.id)}</b></span>`)}
   $("#result").scrollIntoView({behavior:"smooth",block:"start"});
   if(real)await rememberMine(log);
-  if(!(await api.create(log))) toast("Recommendation shown, but it could not be recorded. Check your connection.");
+  if(!(await (CREATING.get(log.id)||api.create(log)))) toast("Recommendation shown, but it could not be recorded yet — it will be saved again when you submit.");
 });
 function renderResult(o){
   const r=o.row,q=Q;
