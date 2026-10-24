@@ -259,6 +259,9 @@ table.spec tr.cls td{background:var(--paper);font-size:11.5px;font-weight:700;te
 .crcl label{display:flex;flex-direction:column;font-size:13px;gap:3px}.crcl input,.crcl select{padding:6px 8px;border:1px solid var(--line,#d9dee5);border-radius:6px;font:inherit}
 .crcl .hint{grid-column:1/-1}
 .ccode{margin-top:10px;padding:8px 10px;border:1px dashed var(--line,#d9dee5);border-radius:8px;font-size:15px}
+.lastdone{background:var(--ok-soft);border:1px solid #A7D7BC;border-radius:10px;padding:10px 12px;margin:0 0 16px;font-size:14.5px}
+.lastdone b.ok{color:var(--ok)}.lastdone .code{font-family:ui-monospace,Consolas,monospace;font-size:16px;letter-spacing:1px}
+.lastdone .sub{font-size:13px;color:var(--muted);margin-top:2px}
 </style>
 </head>
 <body>
@@ -280,6 +283,7 @@ table.spec tr.cls td{background:var(--paper);font-size:11.5px;font-weight:700;te
 <section class="view on" id="v-decide">
   <div class="decide">
     <div class="panel inputs">
+      <div id="lastDone"></div>
       <div class="field">
         <span class="flabel">This recommendation is for <span class="req">*</span></span>
         <div class="purpose-big" id="purpose">
@@ -1064,20 +1068,32 @@ function renderSubmit(log,followUp){
     if(!ok){$("#fbSave").disabled=false;return err("Could not send. Check your connection and press again.")}
     if(real)await rememberMine(log);
     $("#formerr").textContent="";
-    $("#fbwrap").innerHTML=`<div class="done"><strong>${followUp?"Update saved":"Thank you"}</strong>${followUp?"Follow-up recorded.":"Your response goes to the ASP team."}${log.purpose==="Real patient"?`<div class="ccode">ASP Round case code: <b id="ccv">${caseCode(log.id)}</b> <button type="button" class="btn-link" style="display:inline;margin:0 0 0 6px" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('ccv').textContent);this.textContent='Copied'">Copy</button><div class="muted" style="font-size:13px">Write this code in the ASP Round form for this patient.</div></div>`:""}
-      <div style="margin-top:12px"><button class="btn btn-primary" style="width:auto" id="newRec">Start a new recommendation</button></div></div>`;
-    $("#newRec").addEventListener("click",resetForm);
+    nextPatient(log,followUp);
     renderMine();
   };
   draw();
 }
-function resetForm(){
+function resetForm(keep){
   SHOWN=null;STALE=false;
+  const kp=keep===true?{purpose:Q.purpose,setting:Q.setting,psyUnit:Q.psyUnit}:{};
+  if(keep!==true)$("#lastDone").innerHTML="";
   ["cgAge","cgWt","cgCr"].forEach(id=>$("#"+id).value="");$("#crclBox").hidden=true;$("#cgOut").textContent="Enter all four values.";
-  Object.assign(Q,{renal:"",erPlan:"",psyUnit:"",purpose:"",syndrome:"",setting:"",severity:"",preg:"No",mdr:"No",mrsa:"No",pseudo:"No",allergy:"None"});RF=null;
+  Object.assign(Q,{renal:"",erPlan:"",psyUnit:"",purpose:"",syndrome:"",setting:"",severity:"",preg:"No",mdr:"No",mrsa:"No",pseudo:"No",allergy:"None"});RF=null;Object.assign(Q,kp);
   synIn.value="";paintSegs();paintPurpose();renderRF();paintPsy();$("#fbwrap").innerHTML="";$("#formerr").textContent="";
   $("#result").innerHTML='<div class="empty"><strong>Choose the syndrome and patient factors</strong>The recommended regimen, safety checks and source pathway appear here.</div>';
   window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* After Submit the form opens ready for the next patient: same purpose, location of care and psychiatry ward;
+   everything about the patient is cleared. The ASP Round case code stays at the top of the form. */
+function nextPatient(log,followUp){
+  const code=log.purpose==="Real patient"?caseCode(log.id):"";
+  resetForm(true);
+  $("#lastDone").innerHTML=`<div class="lastdone" role="status"><b class="ok">&#10003; ${followUp?"Update saved":"Submitted"}</b>`+
+    (code?` &middot; ASP Round case code <b class="code" id="ccv">${code}</b> <button type="button" class="btn-link" style="display:inline;margin:0 0 0 6px" id="copyCode">Copy</button><div class="sub">Write this code in the ASP Round form. The form below is ready for the next patient.</div>`
+      :`<div class="sub">The form below is ready for the next patient.</div>`)+`</div>`;
+  const c=$("#copyCode");if(c)c.addEventListener("click",()=>{try{navigator.clipboard.writeText(code);c.textContent="Copied"}catch(e){}});
+  toast(followUp?"Update saved":"Submitted. Ready for the next patient");
 }
 
 /* ---------- follow-up list (kept on this device only) ---------- */
